@@ -1,38 +1,33 @@
-[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.x&color=orange)
+# FFS Claims Sandbox (using DBT)
 
-# Medicare LDS Connector
+Based off the Tuva Medicare LDS Connector, see their readme in Tuva_README.md
 
-## 🔗  Docs
-Check out our [docs](https://thetuvaproject.com/) to learn about the project and how you can use it.
-<br/><br/>
+QUESTIONS
+- Tuva only seems set up to run one year at a time. There's a single `cms_hcc_payment_year` variable and the beneficiary data (I think) only requires one row per patient, so it does not accommodate changes over time.
 
-## 🧰  What does this repo do?
-The Medicare LDS Connector is a dbt project that maps Medicare LDS claims data to the Tuva [claims data model](https://thetuvaproject.com/claims-data/data-model/about) which then makes it simple to run the entire [Tuva Project](https://github.com/tuva-health/the_tuva_project).  This connector expects your LDS data to be organized into the tables outlined in the [LDS data dictionaries](https://www.cms.gov/Research-Statistics-Data-and-Systems/Files-for-Order/LimitedDataSets/StandardAnalyticalFiles).
-<br/><br/>  
+## Set up
 
-## 🔌 Database Support
-- BigQuery
-- Redshift
-- Snowflake
-<br/><br/>  
+Install dbt 1.2+ using poetry:
+- `pip install poetry`
+- `poetry init`
+- `poetry add dbt-snowflake`
+- `poetry shell`
 
-## ✅  Quickstart Guide
+Run the following
+- `dbt deps`
+- `dbt init` and enter your manganese snowflake creds
+- `dbt debug`
+- `dbt --version` # should have an up-to-date dbt-core and snowflake plugin
 
-### Step 1: Clone or Fork this Repository
-Unlike [the Tuva Project](https://github.com/tuva-health/the_tuva_project), this repo is a dbt project, not a dbt package.  Clone or fork this repository to your local machine.
-<br/><br/> 
+If applicable: go to `~/.dbt/profiles.yml` and update role
 
-### Step 2: Import the Tuva Project
-Next you need to import the Tuva Project dbt package into the Medicare LDS Connector dbt project.  For example, using dbt CLI you would `cd` into the directly where you cloned this project to and run `dbt deps` to import the latest version of the Tuva Project.
-<br/><br/> 
+## Seed
+Claims data is seeded from sample LDS data available on [CMS](https://data.cms.gov/collection/synthetic-medicare-enrollment-fee-for-service-claims-and-prescription-drug-event). They generated their data using [Synthea](https://github.com/synthetichealth/synthea/wiki/Basic-Setup-and-Running).
+- Place these files in the `seeds/` folder
+- If the database is empty then you need to run: `dbt seed` - only need to run one time to seed the initial tables
+- Note 9/26: we seeded directly to snowflake, instead of using dbt seed (see `notebooks/snowflake_conn` folder). The original data live in the `schmidt-futures` repo in the `data/synthetic_ffs/preprocessed` folder.
 
-### Step 3: Configure Input Database and Schema
-Next you need to tell dbt where your Medicare LDS source data is located.  Do this using the variables `input_database` and `input_schema` in the `dbt_project.yml` file.  You also need to configure your `profile` in the `dbt_project.yml`.
-<br/><br/> 
-
-### Step 4: Run
-Now you're ready to run the connector and the Tuva Project.  For example, using dbt CLI you would `cd` to the project root folder in the command line and execute `dbt build`.  Next you're now ready to do claims data analytics!  Check out the [data marts](https://thetuvaproject.com/data-marts/about) in our docs to learn what tables you should query.
-<br/><br/>
-
-## 🤝 Join our community!
-Join our growing community of healthcare data practitioners on [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)!
+## Run
+- `dbt build --select path:./models`
+- `dbt build --select cms_hcc`
+- `dbt build --select pmpm`

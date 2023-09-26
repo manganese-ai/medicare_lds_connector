@@ -2,11 +2,33 @@ name: 'medicare_lds_connector'
 version: '0.1.0'
 config-version: 2
 
-profile: default                   
+profile: 'medicare_lds_connector'                   
 
+seeds:
+  medicare_lds_connector:
+    +database: sandbox_ffs
+    +schema: lds
+    
 vars:
-  input_database: default
-  input_schema:  default
+  # data locations
+  data_source: lds # output tables
+  input_database: sandbox_ffs # snowflake database ...
+  input_schema:  lds # ... and schema where the raw data is stored 
+
+  # names of tables for seeding (see model/_sources.yml) for names
+  # we don't need to change them
+
+  # where transformed data go?
+  medicare_lds_connector_schema: claims_common # where you want the transformed data to go
+  tuva_database: sandbox_ffs
+
+  # packages enabled
+  claims_enabled: true
+  clinical_enabled: true
+
+  # which year to process
+  ## need to check if can do this iteratively for multiple years!!
+  cms_hcc_payment_year: 2023
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -15,7 +37,14 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target" # directory which will store compiled SQL files
+clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+
+models:
+  medicare_lds_connector:
+    +bind: false
+    +materialized: view
+    core:
+      +materialized: table
