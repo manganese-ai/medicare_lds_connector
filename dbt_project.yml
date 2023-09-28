@@ -1,5 +1,5 @@
 name: 'medicare_lds_connector'
-version: '0.1.0'
+version: '0.1.1'
 config-version: 2
 
 profile: 'medicare_lds_connector'                   
@@ -29,6 +29,8 @@ vars:
   # which year to process
   ## need to check if can do this iteratively for multiple years!!
   cms_hcc_payment_year: 2023
+
+  claims_enabled: true
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
