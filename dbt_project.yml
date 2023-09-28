@@ -24,7 +24,6 @@ vars:
 
   # packages enabled
   claims_enabled: true
-  clinical_enabled: true
 
   # which year to process
   ## need to check if can do this iteratively for multiple years!!
